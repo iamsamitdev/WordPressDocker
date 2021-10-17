@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    networks:
+      - web_network
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=wordpress_db
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=wordpress
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress
+    restart: always
+    networks:
+      - web_network
+    volumes:
+      - ./wordpress:/var/www/html
+    ports:
+      - 8800:80
+    environment:
+      - WORDPRESS_DB_HOST=db:3306
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=wordpress
+      - WORDPRESS_DB_NAME=wordpress_db
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin
+    restart: always
+    networks:
+      - web_network
+    environment:
+      - PMA_ARBITRARY=1
+    ports:
+      - 7770:80
+
+networks:
+  web_network:
+    name: wlamp
+    driver: bridge        
